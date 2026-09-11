@@ -1,13 +1,3 @@
-// Prisma schema — PostgreSQL
-// Indexing notes (see README for the full rationale):
-// - Task: indexed on projectId, assignedToId, status, dueDate — these are the
-//   four columns every dashboard/filter query hits (board views, "my tasks",
-//   status filters, overdue sweeps).
-// - TaskActivity: indexed on (projectId, createdAt) because the live feed and
-//   its "missed events" catch-up query are always "latest N for project X".
-// - Notification: indexed on (userId, isRead) because the unread badge count
-//   and the dropdown list are both "for this user, unread first".
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -49,8 +39,7 @@ model User {
   passwordHash String
   name         String
   role         Role
-  // Bumped on logout / password change to invalidate all outstanding
-  // refresh tokens for this user without needing a token blacklist table.
+
   tokenVersion Int      @default(0)
   createdAt    DateTime @default(now())
 
@@ -83,8 +72,6 @@ model Project {
   tasks    Task[]
   activity TaskActivity[]
 
-  // "projects I created" is the PM's primary query (their access is scoped
-  // to this), so it's indexed.
   @@index([createdById])
   @@index([clientId])
 }
@@ -111,13 +98,11 @@ model Task {
   @@index([assignedToId])
   @@index([status])
   @@index([dueDate])
-  // Composite used by the overdue-sweep job: "not done, due in the past".
+
   @@index([status, dueDate])
 }
 
-// Append-only log — the source of truth for the activity feed. Never
-// derived/recomputed; every status change writes exactly one row here in
-// the same transaction as the task update.
+
 model TaskActivity {
   id         String     @id @default(uuid())
   taskId     String
