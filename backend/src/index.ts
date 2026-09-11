@@ -39,6 +39,6 @@ const httpServer = createServer(app);
 initSockets(httpServer);
 startOverdueJob();
 
-httpServer.listen(env.port,"0.0.0.0", () => {
+httpServer.listen(env.port, "0.0.0.0", () => {
   console.log(`API + WebSocket server listening on :${env.port} (${env.nodeEnv})`);
 });
