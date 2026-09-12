@@ -36,8 +36,12 @@ app.use(errorHandler);
 
 const httpServer = createServer(app);
 
+console.log("🚀 Starting application...");
+
 initSockets(httpServer);
 startOverdueJob();
+
+console.log("🚀 About to listen on port:", env.port);
 
 httpServer.listen(env.port, "0.0.0.0", () => {
   console.log(`API + WebSocket server listening on :${env.port} (${env.nodeEnv})`);
